@@ -31,18 +31,21 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     // 腾讯地图sdk
-    implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.2'
-    // 导航,5.1.9.3-SNAPSHOT快照版本仅测试使用!!
-    implementation 'com.tencent.map:tencent-map-nav-sdk:5.1.9.3-SNAPSHOT'
-    // 定位
-    implementation files('libs/TencentLocationSDK_v8.4.14_ra0311232_20200103_125837_release.aar')
-    // 司乘sdk
-    implementation files('libs/lsdriver_v2.0.0.aar')
-    implementation files('libs/lssupport_v2.0.0.aar')
-    // 检索sdk
+    implementation 'com.tencent.map:tencent-map-vector-sdk:4.3.3.4'
+
+    // 导航版本需与地图版本对应
+    implementation 'com.tencent.map:tencent-map-nav-sdk:5.1.9.9'
+    // 检索sdk，导航sdk必须引用
     implementation('com.tencent.map:tencent-navi-search:1.0.0.3') { exclude group: 'com.android.support' }
-    // 基础库
+    // 基础库，导航sdk必须引用
     implementation 'com.tencent.map:tencent-map-nav-surport:1.0.2.3'
+
+    // 司乘sdk
+    implementation files('libs/lsdriver_v2.0.1_04.03.aar')
+    implementation files('libs/lssupport_v2.0.1_04.03.aar')
+
+    // 定位sdk
+    implementation files('libs/TencentLocationSDK_v8.4.14_ra0311232_20200103_125837_release.aar')
 
     implementation 'androidx.recyclerview:recyclerview:1.0.0-alpha1'
     implementation 'pub.devrel:easypermissions:2.0.0'

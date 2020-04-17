@@ -1,6 +1,7 @@
 package com.tencent.map.driver.synchro.driver;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,9 +19,7 @@ import com.tencent.map.lssupport.bean.TLSBOrderType;
 import com.tencent.map.lssupport.bean.TLSBPosition;
 import com.tencent.map.lssupport.bean.TLSBWayPointType;
 import com.tencent.map.lssupport.bean.TLSDDrvierStatus;
-import com.tencent.map.lssupport.bean.TLSDSortRequestWayPoint;
 import com.tencent.map.lssupport.bean.TLSDWayPointInfo;
-import com.tencent.map.lssupport.bean.TLSLatlng;
 import com.tencent.map.navi.car.CarRouteSearchOptions;
 import com.tencent.map.navi.data.NaviPoi;
 import com.tencent.map.navi.data.RouteData;
@@ -40,8 +39,8 @@ public class HitchHikeDriver extends ExtendDriverBase implements RadioGroup.OnCh
     int curOrderType = TLSBOrderType.TLSDOrderTypeHitchRide;
 
     // 这是司机的起终点
-    NaviPoi from = new NaviPoi(39.938962,116.375685);
-    NaviPoi to = new NaviPoi(39.911975,116.351395);
+    NaviPoi from = new NaviPoi(40.041032,116.27245);
+    NaviPoi to = new NaviPoi(39.868699,116.32198);
     ArrayList<TLSDWayPointInfo> ws = new ArrayList<>();// 拼单的上下车点
 
     int curRouteIndex = 0;
@@ -150,7 +149,6 @@ public class HitchHikeDriver extends ExtendDriverBase implements RadioGroup.OnCh
     public void receiveHitchHikeOrder(View view) {
         if(ws.size() != 0)
             ws.clear();
-        ArrayList<TLSDSortRequestWayPoint> sorts = null;
         switch (radioGroup.getCheckedRadioButtonId()) {
             case R.id.hh_a:// 订单A
                 ws.add(addWayAFrom());
@@ -170,21 +168,15 @@ public class HitchHikeDriver extends ExtendDriverBase implements RadioGroup.OnCh
                 search();// 算路
                 break;
             case R.id.hh_a_and_b_sort:// 获取AB最优送驾顺序
-                sorts = new ArrayList<>();
-                TLSDSortRequestWayPoint infoA = new TLSDSortRequestWayPoint();
-                infoA.setpOrderId(addWayAFrom().getpOrderId());
-                infoA.setStartPoint(new TLSLatlng(addWayAFrom().getLat(), addWayAFrom().getLng()));
-                infoA.setEndPoint(new TLSLatlng(addWayATo().getLat(), addWayATo().getLng()));
-                TLSDSortRequestWayPoint infoB = new TLSDSortRequestWayPoint();
-                infoB.setpOrderId(addWayBFrom().getpOrderId());
-                infoB.setStartPoint(new TLSLatlng(addWayBFrom().getLat(), addWayBFrom().getLng()));
-                infoB.setEndPoint(new TLSLatlng(addWayBTo().getLat(), addWayBTo().getLng()));
-                sorts.add(infoB);
-                sorts.add(infoA);
+                ws.add(addWayAFrom());
+                ws.add(addWayATo());
+                ws.add(addWayBFrom());
+                ws.add(addWayBTo());
+
                 /**
                  * 需要先获取最优送驾顺序
                  */
-                lsManager.requestBestSortedWayPoints(from, to, sorts, new DriDataListener.ISortedWayPointsCallBack() {
+                lsManager.requestBestSortedWayPoints(from, to, ws, new DriDataListener.ISortedWayPointsCallBack() {
                     @Override
                     public void onSortedWaysSuc(ArrayList<TLSDWayPointInfo> sortedWays) {
                         ws.clear();
@@ -209,6 +201,7 @@ public class HitchHikeDriver extends ExtendDriverBase implements RadioGroup.OnCh
     public void search() {
         if(lsManager == null)
             return;
+        lsManager.setCarNaviView(carNaviView);
         lsManager.searchCarRoutes(from, to, ws, CarRouteSearchOptions.create()
                 , new DriDataListener.ISearchCallBack() {
                     @Override
@@ -265,6 +258,10 @@ public class HitchHikeDriver extends ExtendDriverBase implements RadioGroup.OnCh
         w1.setWayPointType(TLSBWayPointType.TLSDWayPointTypeGetIn);
         w1.setLat(39.940080);
         w1.setLng(116.355257);
+        /**
+         * 如果算路所在carNaviView和导航carNaviView相同，则可这样设置途经点bitmap
+         */
+        w1.setImage(BitmapFactory.decodeResource(getResources(), R.mipmap.waypoint1_1));
         return w1;
     }
 
